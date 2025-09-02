@@ -1,0 +1,13 @@
+{
+  "name": "wishlist-rive-buttons",
+  "version": "1.0.0",
+  "description": "Interactive Rive wishlist buttons demo",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  },
+  "keywords": ["rive", "animation", "buttons", "wishlist"],
+  "author": "",
+  "license": "MIT"
+}
