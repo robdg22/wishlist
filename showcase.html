@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rive Buttons Showcase</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 40px;
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .button-container {
+        display: flex;
+        gap: 40px;
+        align-items: center;
+      }
+
+      .button-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .rive-button-large {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background-color: white;
+        border: none;
+        padding: 0;
+        position: relative;
+        cursor: pointer;
+        outline: none;
+        transition: all 0.2s ease;
+      }
+
+      .rive-button-large:focus,
+      .rive-button-large:hover {
+        outline: none;
+        box-shadow: 0 0 0 3px white, 0 0 0 12px #00539F;
+      }
+
+      .rive-button-large:active {
+        /* No transform - removed scale effect */
+      }
+
+      .canvas-large {
+        width: 108px;
+        height: 108px;
+        display: block;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .button-label {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="button-container">
+      <div class="button-item">
+        <button class="rive-button-large" id="standardButton">
+          <canvas class="canvas-large" id="canvas-standard"></canvas>
+        </button>
+        <div class="button-label">Standard</div>
+      </div>
+
+      <div class="button-item">
+        <button class="rive-button-large" id="backgroundButton">
+          <canvas class="canvas-large" id="canvas-background"></canvas>
+        </button>
+        <div class="button-label">Background</div>
+      </div>
+
+      <div class="button-item">
+        <button class="rive-button-large" id="beatButton">
+          <canvas class="canvas-large" id="canvas-beat"></canvas>
+        </button>
+        <div class="button-label">Beat</div>
+      </div>
+
+      <div class="button-item">
+        <button class="rive-button-large" id="spinButton">
+          <canvas class="canvas-large" id="canvas-spin"></canvas>
+        </button>
+        <div class="button-label">Spin</div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/@rive-app/canvas"></script>
+    <script>
+      // Store all button properties for interaction
+      const buttonStates = {};
+
+      // Generic click handler
+      function handleButtonClick(buttonId, property) {
+        if (property) {
+          const currentValue = property.value;
+          property.value = !currentValue;
+          console.log(`${buttonId} button - Toggled IsSelected to:`, !currentValue);
+        }
+      }
+
+      // Standard Animation
+      const rivStandard = new rive.Rive({
+        src: './wishlist.riv',
+        canvas: document.getElementById('canvas-standard'),
+        autoplay: true,
+        autoBind: true,
+        artboard: 'Artboard',
+        stateMachines: 'State Machine 1',
+        onLoad: () => {
+          rivStandard.resizeDrawingSurfaceToCanvas();
+          const vmi = rivStandard.viewModelInstance;
+          if (vmi) {
+            vmi.boolean('IsSelected').value = false;
+            buttonStates.standard = vmi.boolean('IsSelected');
+          }
+        }
+      });
+
+      // Background Animation
+      const rivBackground = new rive.Rive({
+        src: './wishlist_bg_v1.riv',
+        canvas: document.getElementById('canvas-background'),
+        autoplay: true,
+        autoBind: true,
+        artboard: 'Artboard',
+        stateMachines: 'State Machine 1',
+        onLoad: () => {
+          rivBackground.resizeDrawingSurfaceToCanvas();
+          const vmi = rivBackground.viewModelInstance;
+          if (vmi) {
+            vmi.boolean('IsSelected').value = false;
+            buttonStates.background = vmi.boolean('IsSelected');
+          }
+        }
+      });
+
+      // Beat Animation (using gap animation)
+      const rivBeat = new rive.Rive({
+        src: './wishlist_gap.riv',
+        canvas: document.getElementById('canvas-beat'),
+        autoplay: true,
+        autoBind: true,
+        artboard: 'Artboard',
+        stateMachines: 'State Machine 1',
+        onLoad: () => {
+          rivBeat.resizeDrawingSurfaceToCanvas();
+          const vmi = rivBeat.viewModelInstance;
+          if (vmi) {
+            vmi.boolean('IsSelected').value = false;
+            buttonStates.beat = vmi.boolean('IsSelected');
+          }
+        }
+      });
+
+      // Spin Animation
+      const rivSpin = new rive.Rive({
+        src: './wishlist_spin.riv',
+        canvas: document.getElementById('canvas-spin'),
+        autoplay: true,
+        autoBind: true,
+        artboard: 'Artboard',
+        stateMachines: 'State Machine 1',
+        onLoad: () => {
+          const vmi = rivSpin.viewModelInstance;
+          if (vmi) {
+            vmi.boolean('IsSelected').value = false;
+            buttonStates.spin = vmi.boolean('IsSelected');
+          }
+          rivSpin.resizeDrawingSurfaceToCanvas();
+        }
+      });
+
+      // Add click handlers
+      document.getElementById('standardButton').addEventListener('click', () => 
+        handleButtonClick('standard', buttonStates.standard)
+      );
+      
+      document.getElementById('backgroundButton').addEventListener('click', () => 
+        handleButtonClick('background', buttonStates.background)
+      );
+      
+      document.getElementById('beatButton').addEventListener('click', () => 
+        handleButtonClick('beat', buttonStates.beat)
+      );
+      
+      document.getElementById('spinButton').addEventListener('click', () => 
+        handleButtonClick('spin', buttonStates.spin)
+      );
+    </script>
+  </body>
+</html>
