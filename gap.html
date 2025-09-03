@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rive Test</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+      }
+
+      .rive-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: white;
+        border: none;
+        padding: 0;
+        position: relative;
+        cursor: pointer;
+        outline: none;
+        transition: all 0.2s ease;
+      }
+
+      .rive-button:focus,
+      .rive-button:hover {
+        outline: none;
+        box-shadow: 0 0 0 1px white, 0 0 0 4px #00539F;
+        transform: scale(1.05);
+      }
+
+      .rive-button:active {
+        transform: scale(0.95);
+      }
+
+      #canvas {
+        width: 36px;
+        height: 36px;
+        display: block;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .rive-button-large {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background-color: white;
+        border: none;
+        padding: 0;
+        position: relative;
+        cursor: pointer;
+        outline: none;
+        transition: all 0.2s ease;
+        margin-left: 20px;
+      }
+
+      .rive-button-large:focus,
+      .rive-button-large:hover {
+        outline: none;
+        box-shadow: 0 0 0 3px white, 0 0 0 12px #00539F;
+        transform: scale(1.05);
+      }
+
+      .rive-button-large:active {
+        transform: scale(0.95);
+      }
+
+      #canvas-large {
+        width: 108px;
+        height: 108px;
+        display: block;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .button-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="button-container">
+      <button class="rive-button" id="riveButton">
+        <canvas id="canvas"></canvas>
+      </button>
+      
+      <button class="rive-button-large" id="riveButtonLarge">
+        <canvas id="canvas-large"></canvas>
+      </button>
+    </div>
+
+    <script src="https://unpkg.com/@rive-app/canvas"></script>
+    <script>
+      const riv = new rive.Rive({
+        src: './wishlist_gap.riv',
+        canvas: document.getElementById('canvas'),
+        autoplay: true,
+        autoBind: true,
+        artboard: 'Artboard',
+        stateMachines: 'State Machine 1',
+
+        onLoad: () => {
+          
+            let vmi = riv.viewModelInstance
+            vmi.boolean('IsSelected').value = true
+          
+            riv.resizeDrawingSurfaceToCanvas();
+            
+            // Store reference for button click handler
+            window.isSelectedProperty = vmi.boolean('IsSelected');
+        }
+      });
+      
+      // Create second Rive instance for large button
+      const rivLarge = new rive.Rive({
+        src: './wishlist_gap.riv',
+        canvas: document.getElementById('canvas-large'),
+        autoplay: true,
+        autoBind: true,
+        artboard: 'Artboard',
+        stateMachines: 'State Machine 1',
+
+        onLoad: () => {
+          
+            let vmiLarge = rivLarge.viewModelInstance
+            vmiLarge.boolean('IsSelected').value = false
+          
+            rivLarge.resizeDrawingSurfaceToCanvas();
+            
+            // Store reference for large button click handler
+            window.isSelectedPropertyLarge = vmiLarge.boolean('IsSelected');
+        }
+      });
+
+      // Add click handler to small button
+      document.getElementById('riveButton').addEventListener('click', () => {
+        if (window.isSelectedProperty) {
+          const currentValue = window.isSelectedProperty.value;
+          window.isSelectedProperty.value = !currentValue;
+          console.log('Small button - Toggled IsSelected to:', !currentValue);
+        }
+      });
+
+      // Add click handler to large button
+      document.getElementById('riveButtonLarge').addEventListener('click', () => {
+        if (window.isSelectedPropertyLarge) {
+          const currentValue = window.isSelectedPropertyLarge.value;
+          window.isSelectedPropertyLarge.value = !currentValue;
+          console.log('Large button - Toggled IsSelected to:', !currentValue);
+        }
+      });
+    </script>
+  </body>
+</html>
