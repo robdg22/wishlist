@@ -38,9 +38,9 @@
         gap: 15px;
       }
 
-      .rive-button-large {
-        width: 108px;
-        height: 108px;
+      .rive-button {
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
         background-color: white;
         border: none;
@@ -51,14 +51,19 @@
         transition: all 0.2s ease;
       }
 
-      .rive-button-large:focus,
-      .rive-button-large:hover {
+      .rive-button.large {
+        width: 72px;
+        height: 72px;
+      }
+
+      .rive-button:focus,
+      .rive-button:hover {
         outline: none;
         /* Dynamic focus color will be set via JavaScript */
       }
 
       /* High contrast focus indicator for accessibility */
-      .rive-button-large:focus-visible {
+      .rive-button:focus-visible {
         outline: 3px solid #000;
         outline-offset: 4px;
       }
@@ -102,12 +107,17 @@
         overflow: hidden;
       }
 
-      .canvas-large {
-        width: 108px;
-        height: 108px;
+      .canvas {
+        width: 36px;
+        height: 36px;
         display: block;
         border-radius: 50%;
         pointer-events: none;
+      }
+
+      .canvas.large {
+        width: 72px;
+        height: 72px;
       }
 
       .button-label {
@@ -221,6 +231,35 @@
         margin-bottom: 25px;
       }
 
+      .size-toggle-section {
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .size-toggle-btn {
+        background: #00539F;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.2s ease;
+      }
+
+      .size-toggle-btn:hover {
+        background: #003d7a;
+      }
+
+      .size-toggle-btn.active {
+        background: #E81C2D;
+      }
+
+      .size-toggle-btn.active:hover {
+        background: #d01624;
+      }
+
 
       .action-buttons {
         display: flex;
@@ -279,48 +318,48 @@
           <h2 id="buttons-heading" class="sr-only">Animation buttons</h2>
           <div class="button-item">
             <button 
-              class="rive-button-large" 
+              class="rive-button" 
               id="standardButton"
               aria-label="Add to wishlist"
               aria-pressed="false"
               type="button">
-              <canvas class="canvas-large" id="canvas-standard" aria-hidden="true"></canvas>
+              <canvas class="canvas" id="canvas-standard" aria-hidden="true"></canvas>
             </button>
             <div class="button-label" aria-hidden="true">Standard</div>
           </div>
 
           <div class="button-item">
             <button 
-              class="rive-button-large" 
+              class="rive-button" 
               id="beatButton"
               aria-label="Add to wishlist"
               aria-pressed="false"
               type="button">
-              <canvas class="canvas-large" id="canvas-beat" aria-hidden="true"></canvas>
+              <canvas class="canvas" id="canvas-beat" aria-hidden="true"></canvas>
             </button>
             <div class="button-label" aria-hidden="true">Beat</div>
           </div>
 
           <div class="button-item">
             <button 
-              class="rive-button-large" 
+              class="rive-button" 
               id="spinButton"
               aria-label="Add to wishlist"
               aria-pressed="false"
               type="button">
-              <canvas class="canvas-large" id="canvas-spin" aria-hidden="true"></canvas>
+              <canvas class="canvas" id="canvas-spin" aria-hidden="true"></canvas>
             </button>
             <div class="button-label" aria-hidden="true">Spin</div>
           </div>
 
           <div class="button-item">
             <button 
-              class="rive-button-large" 
+              class="rive-button" 
               id="spinDoubleButton"
               aria-label="Add to wishlist"
               aria-pressed="false"
               type="button">
-              <canvas class="canvas-large" id="canvas-spin-double" aria-hidden="true"></canvas>
+              <canvas class="canvas" id="canvas-spin-double" aria-hidden="true"></canvas>
             </button>
             <div class="button-label" aria-hidden="true">Spin Double</div>
           </div>
@@ -329,6 +368,11 @@
 
       <div class="color-controls">
         
+        <div class="size-toggle-section">
+          <h3>Button Size</h3>
+          <button class="size-toggle-btn" id="sizeToggle">Double Size</button>
+        </div>
+
         <div class="color-preset-section">
           <h3>Color Presets</h3>
           <div class="radio-group">
@@ -433,6 +477,7 @@
 
       let colorMode = '3'; // '2' or '3'
       let currentPreset = 'blue'; // 'blue', 'red', 'neutral', 'custom'
+      let isLargeSize = false; // Track button size state
 
       // Color presets
       const presets = {
@@ -491,6 +536,52 @@
         }
       }
 
+      // Toggle button size
+      function toggleButtonSize() {
+        isLargeSize = !isLargeSize;
+        const buttons = document.querySelectorAll('.rive-button');
+        const canvases = document.querySelectorAll('.canvas');
+        const toggleBtn = document.getElementById('sizeToggle');
+        
+        buttons.forEach(button => {
+          if (isLargeSize) {
+            button.classList.add('large');
+          } else {
+            button.classList.remove('large');
+          }
+        });
+        
+        canvases.forEach(canvas => {
+          if (isLargeSize) {
+            canvas.classList.add('large');
+            canvas.width = 72;
+            canvas.height = 72;
+          } else {
+            canvas.classList.remove('large');
+            canvas.width = 36;
+            canvas.height = 36;
+          }
+        });
+        
+        // Update button text and state
+        if (isLargeSize) {
+          toggleBtn.textContent = 'Normal Size';
+          toggleBtn.classList.add('active');
+        } else {
+          toggleBtn.textContent = 'Double Size';
+          toggleBtn.classList.remove('active');
+        }
+        
+        // Resize all Rive instances
+        Object.values(riveInstances).forEach(instance => {
+          if (instance && instance.resizeDrawingSurfaceToCanvas) {
+            instance.resizeDrawingSurfaceToCanvas();
+          }
+        });
+        
+        announceToScreenReader(`Button size changed to ${isLargeSize ? 'large' : 'normal'}`);
+      }
+
       // Update focus state colors
       function updateFocusState() {
         const outlineColorHex = currentColors.outline;
@@ -498,10 +589,10 @@
         // Create CSS rule for dynamic focus state
         const style = document.createElement('style');
         style.textContent = `
-          .rive-button-large:focus,
-          .rive-button-large:hover {
+          .rive-button:focus,
+          .rive-button:hover {
             outline: none;
-            box-shadow: 0 0 0 3px white, 0 0 0 12px ${outlineColorHex} !important;
+            box-shadow: 0 0 0 1px white, 0 0 0 4px ${outlineColorHex} !important;
           }
         `;
         
@@ -668,6 +759,9 @@
       document.getElementById('spinDoubleButton').addEventListener('click', () => 
         handleButtonClick('spinDouble', buttonStates.spinDouble)
       );
+
+      // Size toggle button listener
+      document.getElementById('sizeToggle').addEventListener('click', toggleButtonSize);
 
       // Color preset radio button listeners
       document.getElementById('bluePreset').addEventListener('change', (e) => {
