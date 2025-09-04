@@ -20,6 +20,8 @@
         display: flex;
         gap: 40px;
         align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
       }
 
       .button-item {
@@ -96,6 +98,13 @@
           <canvas class="canvas-large" id="canvas-spin"></canvas>
         </button>
         <div class="button-label">Spin</div>
+      </div>
+
+      <div class="button-item">
+        <button class="rive-button-large" id="spinX2Button">
+          <canvas class="canvas-large" id="canvas-spin-x2"></canvas>
+        </button>
+        <div class="button-label">Spin X2</div>
       </div>
     </div>
 
@@ -185,6 +194,24 @@
         }
       });
 
+      // Spin X2 Animation
+      const rivSpinX2 = new rive.Rive({
+        src: './wishlist_spin_X2.riv',
+        canvas: document.getElementById('canvas-spin-x2'),
+        autoplay: true,
+        autoBind: true,
+        artboard: 'Artboard',
+        stateMachines: 'State Machine 1',
+        onLoad: () => {
+          const vmi = rivSpinX2.viewModelInstance;
+          if (vmi) {
+            vmi.boolean('IsSelected').value = false;
+            buttonStates.spinX2 = vmi.boolean('IsSelected');
+          }
+          rivSpinX2.resizeDrawingSurfaceToCanvas();
+        }
+      });
+
       // Add click handlers
       document.getElementById('standardButton').addEventListener('click', () => 
         handleButtonClick('standard', buttonStates.standard)
@@ -200,6 +227,10 @@
       
       document.getElementById('spinButton').addEventListener('click', () => 
         handleButtonClick('spin', buttonStates.spin)
+      );
+      
+      document.getElementById('spinX2Button').addEventListener('click', () => 
+        handleButtonClick('spinX2', buttonStates.spinX2)
       );
     </script>
   </body>
