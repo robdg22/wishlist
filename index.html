@@ -118,8 +118,8 @@
       }
 
       .color-controls {
-        padding: 16px 30px 30px 30px;
-        border: 1px solid #CCCCCC ;
+        padding: 20px 30px 30px 30px;
+        border: 1px solid #CCCCCC;
       }
 
       .color-controls h2 {
@@ -128,57 +128,133 @@
         text-align: left;
       }
 
+      .color-mode-section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .radio-option input[type="radio"] {
+        margin: 0;
+      }
+
       .color-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
       }
 
       .color-control {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 12px;
       }
 
       .color-control label {
         font-weight: 500;
         color: #555;
+        font-size: 16px;
       }
 
-      .color-input-wrapper {
+      .color-preset-buttons {
         display: flex;
-        align-items: center;
-        gap: 10px;
+        gap: 8px;
+        flex-wrap: wrap;
       }
 
-      .color-input {
-        width: 60px;
+      .color-preset-btn {
+        width: 50px;
         height: 40px;
-        border: none;
+        border: 2px solid #ddd;
         border-radius: 6px;
         cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
       }
 
-      .color-hex {
-        font-family: monospace;
-        font-size: 14px;
+      .color-preset-btn:hover {
+        transform: scale(1.05);
+        border-color: #999;
+      }
+
+      .color-preset-btn.active {
+        border-color: #000;
+        border-width: 3px;
+      }
+
+      .color-picker-btn {
+        width: 50px;
+        height: 40px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
         color: #666;
-        min-width: 80px;
       }
 
-      .reset-button {
+      .color-picker-btn:hover {
+        transform: scale(1.05);
+        border-color: #999;
+        background: #e9e9e9;
+      }
+
+      .color-preset-section {
+        margin-bottom: 25px;
+      }
+
+
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 25px;
+        flex-wrap: wrap;
+      }
+
+      .action-btn {
         background: #00539F;
         color: white;
         border: none;
-        padding: 12px 24px;
+        padding: 12px 20px;
         border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
-        margin-top: 20px;
+        transition: background 0.2s ease;
       }
 
-      .reset-button:hover {
+      .action-btn:hover {
         background: #003d7a;
+      }
+
+      .action-btn.secondary {
+        background: #666;
+      }
+
+      .action-btn.secondary:hover {
+        background: #444;
+      }
+
+      .disabled {
+        opacity: 0.5;
+        pointer-events: none;
       }
 
       .info-panel {
@@ -189,15 +265,6 @@
         margin-bottom: 20px;
       }
 
-      .debug-info {
-        font-family: monospace;
-        font-size: 12px;
-        color: #666;
-        background: #f8f9fa;
-        padding: 10px;
-        border-radius: 4px;
-        margin-top: 10px;
-      }
     </style>
   </head>
   <body>
@@ -261,38 +328,93 @@
       </main>
 
       <div class="color-controls">
-        <h2>Choose colours</h2>
-        <div class="color-grid">
-          <div class="color-control">
-            <label>Fill Colour</label>
-            <div class="color-input-wrapper">
-              <input type="color" id="fillColor" class="color-input" value="#E81C2D">
-              <span class="color-hex" id="fillHex">#E81C2D</span>
+        
+        <div class="color-preset-section">
+          <h3>Color Presets</h3>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="colorPreset" value="blue" id="bluePreset" checked>
+              <span>Blue</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="colorPreset" value="red" id="redPreset">
+              <span>Red</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="colorPreset" value="neutral" id="neutralPreset">
+              <span>Neutral</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="colorPreset" value="custom" id="customPreset">
+              <span>Custom</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="custom-controls" id="customControls" style="display: none;">
+          <div class="color-mode-section">
+            <h3>Color Mode</h3>
+            <div class="radio-group">
+              <label class="radio-option">
+                <input type="radio" name="colorMode" value="2" id="twoColorMode">
+                <span>2 colours</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="colorMode" value="3" id="threeColorMode" checked>
+                <span>3 colours</span>
+              </label>
             </div>
           </div>
 
-          <div class="color-control">
-            <label>Outline Colour</label>
-            <div class="color-input-wrapper">
-              <input type="color" id="outlineColor" class="color-input" value="#00539F">
-              <span class="color-hex" id="outlineHex">#00539F</span>
+          <div class="color-grid">
+            <div class="color-control">
+              <label>Fill</label>
+              <div class="color-preset-buttons" id="fillPresets">
+                <button class="color-preset-btn" data-color="#E81C2D" style="background-color: #E81C2D;"></button>
+                <button class="color-preset-btn" data-color="#00539F" style="background-color: #00539F;"></button>
+                <button class="color-preset-btn" data-color="#333333" style="background-color: #333333;"></button>
+                <button class="color-preset-btn" data-color="#FFFFFF" style="background-color: #FFFFFF;"></button>
+                <button class="color-preset-btn" data-color="#FFD2C3" style="background-color: #FFD2C3;"></button>
+                <button class="color-picker-btn" id="fillColorPicker">+</button>
+              </div>
             </div>
-          </div>
 
-          <div class="color-control">
-            <label>Background Colour</label>
-            <div class="color-input-wrapper">
-              <input type="color" id="backgroundColor" class="color-input" value="#FFD2C3">
-              <span class="color-hex" id="backgroundHex">#FFD2C3</span>
+            <div class="color-control">
+              <label>Outline</label>
+              <div class="color-preset-buttons" id="outlinePresets">
+                <button class="color-preset-btn" data-color="#E81C2D" style="background-color: #E81C2D;"></button>
+                <button class="color-preset-btn" data-color="#00539F" style="background-color: #00539F;"></button>
+                <button class="color-preset-btn" data-color="#333333" style="background-color: #333333;"></button>
+                <button class="color-preset-btn" data-color="#FFFFFF" style="background-color: #FFFFFF;"></button>
+                <button class="color-preset-btn" data-color="#FFD2C3" style="background-color: #FFD2C3;"></button>
+                <button class="color-picker-btn" id="outlineColorPicker">+</button>
+              </div>
             </div>
+
+            <div class="color-control" id="backgroundControl">
+              <label>Background</label>
+              <div class="color-preset-buttons" id="backgroundPresets">
+                <button class="color-preset-btn" data-color="#E81C2D" style="background-color: #E81C2D;"></button>
+                <button class="color-preset-btn" data-color="#00539F" style="background-color: #00539F;"></button>
+                <button class="color-preset-btn" data-color="#333333" style="background-color: #333333;"></button>
+                <button class="color-preset-btn" data-color="#FFFFFF" style="background-color: #FFFFFF;"></button>
+                <button class="color-preset-btn" data-color="#FFD2C3" style="background-color: #FFD2C3;"></button>
+                <button class="color-picker-btn" id="backgroundColorPicker">+</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="action-btn" id="swapColors">Swap Colors</button>
+            <button class="action-btn secondary" id="resetColors">Reset to Defaults</button>
           </div>
         </div>
         
-        <button class="reset-button" id="resetColors">Reset to Defaults</button>
-        
-        <div class="debug-info" id="debugInfo">
-          Debug info will appear here...
-        </div>
+
+        <!-- Hidden color inputs for the color picker functionality -->
+        <input type="color" id="fillColorInput" style="display: none;">
+        <input type="color" id="outlineColorInput" style="display: none;">
+        <input type="color" id="backgroundColorInput" style="display: none;">
       </div>
     </div>
 
@@ -301,6 +423,23 @@
       // Store all button states and instances
       const buttonStates = {};
       const riveInstances = {};
+
+      // Current color selections
+      let currentColors = {
+        fill: '#FFFFFF',
+        outline: '#00539F', 
+        background: '#FFD2C3'
+      };
+
+      let colorMode = '3'; // '2' or '3'
+      let currentPreset = 'blue'; // 'blue', 'red', 'neutral', 'custom'
+
+      // Color presets
+      const presets = {
+        blue: { fill: '#FFFFFF', outline: '#00539F', background: '#00539F' },
+        red: { fill: '#FFFFFF', outline: '#E81C2D', background: '#E81C2D' },
+        neutral: { fill: '#FFFFFF', outline: '#333333', background: '#333333' }
+      };
 
       // Color conversion utilities
       function hexToRgba(hex) {
@@ -311,10 +450,6 @@
         return (255 << 24) | (r << 16) | (g << 8) | b;
       }
 
-      function updateDebugInfo(message) {
-        const debugEl = document.getElementById('debugInfo');
-        debugEl.textContent = message;
-      }
 
       // Update button accessibility attributes
       function updateButtonAccessibility(buttonId, isSelected) {
@@ -353,13 +488,12 @@
           updateButtonAccessibility(buttonId, newValue);
           
           console.log(`${buttonId} button - Toggled IsSelected to:`, newValue);
-          updateDebugInfo(`${buttonId}: IsSelected = ${newValue}`);
         }
       }
 
       // Update focus state colors
       function updateFocusState() {
-        const outlineColorHex = document.getElementById('outlineColor').value;
+        const outlineColorHex = currentColors.outline;
         
         // Create CSS rule for dynamic focus state
         const style = document.createElement('style');
@@ -381,22 +515,74 @@
         document.head.appendChild(style);
       }
 
+      // Update active button states
+      function updateActiveButtons() {
+        // Clear all active states
+        document.querySelectorAll('.color-preset-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+
+        // Set active states based on current colors
+        document.querySelectorAll(`#fillPresets .color-preset-btn[data-color="${currentColors.fill}"]`).forEach(btn => {
+          btn.classList.add('active');
+        });
+        document.querySelectorAll(`#outlinePresets .color-preset-btn[data-color="${currentColors.outline}"]`).forEach(btn => {
+          btn.classList.add('active');
+        });
+        document.querySelectorAll(`#backgroundPresets .color-preset-btn[data-color="${currentColors.background}"]`).forEach(btn => {
+          btn.classList.add('active');
+        });
+      }
+
+      // Apply color preset
+      function applyPreset(preset) {
+        const customControls = document.getElementById('customControls');
+        
+        if (preset === 'custom') {
+          // Show custom controls but don't change colors
+          customControls.style.display = 'block';
+          currentPreset = preset;
+          updateActiveButtons();
+        } else if (presets[preset]) {
+          // Apply preset colors and hide custom controls
+          currentColors = { ...presets[preset] };
+          currentPreset = preset;
+          customControls.style.display = 'none';
+          updateActiveButtons();
+          updateColors();
+        }
+      }
+
+      // Handle color mode changes
+      function updateColorMode() {
+        const backgroundControl = document.getElementById('backgroundControl');
+        
+        if (colorMode === '2') {
+          // In 2-color mode, background matches outline
+          currentColors.background = currentColors.outline;
+          backgroundControl.classList.add('disabled');
+        } else {
+          // In 3-color mode, background is independent
+          backgroundControl.classList.remove('disabled');
+        }
+        
+        updateActiveButtons();
+        updateColors();
+      }
+
       // Color update function
       function updateColors() {
-        const fillColor = hexToRgba(document.getElementById('fillColor').value);
-        const outlineColor = hexToRgba(document.getElementById('outlineColor').value);
-        const backgroundColor = hexToRgba(document.getElementById('backgroundColor').value);
-
-        // Update hex displays
-        document.getElementById('fillHex').textContent = document.getElementById('fillColor').value;
-        document.getElementById('outlineHex').textContent = document.getElementById('outlineColor').value;
-        document.getElementById('backgroundHex').textContent = document.getElementById('backgroundColor').value;
+        const fillColor = hexToRgba(currentColors.fill);
+        const outlineColor = hexToRgba(currentColors.outline);
+        const backgroundColor = hexToRgba(currentColors.background);
 
         // Update focus state
         updateFocusState();
 
         // Update all button instances
-        Object.values(riveInstances).forEach(instance => {
+        console.log('Available Rive instances:', Object.keys(riveInstances));
+        Object.entries(riveInstances).forEach(([buttonId, instance]) => {
+          console.log(`Updating colors for ${buttonId}...`);
           const vmi = instance.viewModelInstance;
           if (vmi) {
             try {
@@ -404,16 +590,21 @@
               const outlineProp = vmi.color('Outline');
               const backgroundProp = vmi.color('Background');
 
+              console.log(`${buttonId} - Fill:`, fillProp ? 'found' : 'missing', 
+                         'Outline:', outlineProp ? 'found' : 'missing',
+                         'Background:', backgroundProp ? 'found' : 'missing');
+
               if (fillProp) fillProp.value = fillColor;
               if (outlineProp) outlineProp.value = outlineColor;
               if (backgroundProp) backgroundProp.value = backgroundColor;
             } catch (error) {
-              console.warn('Error updating colors:', error);
+              console.warn(`Error updating colors for ${buttonId}:`, error);
             }
+          } else {
+            console.warn(`No view model instance for ${buttonId}`);
           }
         });
 
-        updateDebugInfo(`Colors updated: Fill=${document.getElementById('fillColor').value}, Outline=${document.getElementById('outlineColor').value}, Background=${document.getElementById('backgroundColor').value}`);
       }
 
       // Create Rive instance for each artboard
@@ -445,11 +636,9 @@
             }
             
             instance.resizeDrawingSurfaceToCanvas();
-            updateDebugInfo(`${buttonId} loaded successfully`);
           },
           onLoadError: (error) => {
             console.error(`❌ ${buttonId} load error:`, error);
-            updateDebugInfo(`${buttonId} failed to load`);
           }
         });
 
@@ -480,21 +669,155 @@
         handleButtonClick('spinDouble', buttonStates.spinDouble)
       );
 
-      // Color control event listeners
-      document.getElementById('fillColor').addEventListener('input', updateColors);
-      document.getElementById('outlineColor').addEventListener('input', updateColors);
-      document.getElementById('backgroundColor').addEventListener('input', updateColors);
+      // Color preset radio button listeners
+      document.getElementById('bluePreset').addEventListener('change', (e) => {
+        if (e.target.checked) applyPreset('blue');
+      });
+
+      document.getElementById('redPreset').addEventListener('change', (e) => {
+        if (e.target.checked) applyPreset('red');
+      });
+
+      document.getElementById('neutralPreset').addEventListener('change', (e) => {
+        if (e.target.checked) applyPreset('neutral');
+      });
+
+      document.getElementById('customPreset').addEventListener('change', (e) => {
+        if (e.target.checked) applyPreset('custom');
+      });
+
+      // Color mode radio button listeners (for custom mode)
+      document.getElementById('twoColorMode').addEventListener('change', (e) => {
+        if (e.target.checked) {
+          colorMode = '2';
+          updateColorMode();
+        }
+      });
+
+      document.getElementById('threeColorMode').addEventListener('change', (e) => {
+        if (e.target.checked) {
+          colorMode = '3';
+          updateColorMode();
+        }
+      });
+
+      // Color preset button listeners
+      function setupColorPresetListeners() {
+        // Fill color presets
+        document.querySelectorAll('#fillPresets .color-preset-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            currentColors.fill = btn.dataset.color;
+            currentPreset = 'custom';
+            document.getElementById('customPreset').checked = true;
+            updateActiveButtons();
+            updateColors();
+          });
+        });
+
+        // Outline color presets
+        document.querySelectorAll('#outlinePresets .color-preset-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            currentColors.outline = btn.dataset.color;
+            if (colorMode === '2') {
+              currentColors.background = btn.dataset.color; // Sync background in 2-color mode
+            }
+            currentPreset = 'custom';
+            document.getElementById('customPreset').checked = true;
+            updateActiveButtons();
+            updateColors();
+          });
+        });
+
+        // Background color presets (only active in 3-color mode)
+        document.querySelectorAll('#backgroundPresets .color-preset-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (colorMode === '3') {
+              currentColors.background = btn.dataset.color;
+              currentPreset = 'custom';
+              document.getElementById('customPreset').checked = true;
+              updateActiveButtons();
+              updateColors();
+            }
+          });
+        });
+
+        // Color picker buttons
+        document.getElementById('fillColorPicker').addEventListener('click', () => {
+          document.getElementById('fillColorInput').click();
+        });
+
+        document.getElementById('outlineColorPicker').addEventListener('click', () => {
+          document.getElementById('outlineColorInput').click();
+        });
+
+        document.getElementById('backgroundColorPicker').addEventListener('click', () => {
+          document.getElementById('backgroundColorInput').click();
+        });
+
+        // Color input listeners
+        document.getElementById('fillColorInput').addEventListener('change', (e) => {
+          currentColors.fill = e.target.value;
+          currentPreset = 'custom';
+          document.getElementById('customPreset').checked = true;
+          updateActiveButtons();
+          updateColors();
+        });
+
+        document.getElementById('outlineColorInput').addEventListener('change', (e) => {
+          currentColors.outline = e.target.value;
+          if (colorMode === '2') {
+            currentColors.background = e.target.value;
+          }
+          currentPreset = 'custom';
+          document.getElementById('customPreset').checked = true;
+          updateActiveButtons();
+          updateColors();
+        });
+
+        document.getElementById('backgroundColorInput').addEventListener('change', (e) => {
+          if (colorMode === '3') {
+            currentColors.background = e.target.value;
+            currentPreset = 'custom';
+            document.getElementById('customPreset').checked = true;
+            updateActiveButtons();
+            updateColors();
+          }
+        });
+      }
+
+      // Swap colors function
+      function swapColors() {
+        const temp = currentColors.fill;
+        currentColors.fill = currentColors.outline;
+        currentColors.outline = temp;
+        
+        if (colorMode === '2') {
+          currentColors.background = currentColors.outline; // Keep background synced
+        }
+        
+        updateActiveButtons();
+        updateColors();
+        announceToScreenReader('Colors swapped');
+      }
 
       // Reset colors button
       document.getElementById('resetColors').addEventListener('click', () => {
-        document.getElementById('fillColor').value = '#E81C2D';
-        document.getElementById('outlineColor').value = '#00539F';
-        document.getElementById('backgroundColor').value = '#FFD2C3';
-        updateColors();
+        applyPreset('blue');
+        document.getElementById('bluePreset').checked = true;
+        colorMode = '3';
+        document.getElementById('threeColorMode').checked = true;
+        announceToScreenReader('Colors reset to blue preset');
       });
 
-      // Initial debug message
-      updateDebugInfo('Initializing Rive instances...');
+      // Swap colors button
+      document.getElementById('swapColors').addEventListener('click', swapColors);
+
+      // Initialize the preset system
+      setupColorPresetListeners();
+      
+      // Apply initial preset (blue)
+      applyPreset('blue');
+
     </script>
   </body>
 </html>
