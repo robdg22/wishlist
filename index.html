@@ -57,6 +57,51 @@
         /* Dynamic focus color will be set via JavaScript */
       }
 
+      /* High contrast focus indicator for accessibility */
+      .rive-button-large:focus-visible {
+        outline: 3px solid #000;
+        outline-offset: 4px;
+      }
+
+      /* Screen reader only text */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      /* Skip link for keyboard navigation */
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: #000;
+        color: #fff;
+        padding: 8px;
+        text-decoration: none;
+        z-index: 1000;
+        border-radius: 4px;
+      }
+
+      .skip-link:focus {
+        top: 6px;
+      }
+
+      /* Live region for announcements */
+      .live-region {
+        position: absolute;
+        left: -10000px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      }
+
       .canvas-large {
         width: 108px;
         height: 108px;
@@ -156,38 +201,64 @@
     </style>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <div class="live-region" aria-live="polite" id="announcements"></div>
+    
     <div class="showcase-container">
       <h1>Wishlist button animation</h1>
       
-      <div class="buttons-section">
-        <div class="button-item">
-          <button class="rive-button-large" id="standardButton">
-            <canvas class="canvas-large" id="canvas-standard"></canvas>
-          </button>
-          <div class="button-label">Standard</div>
-        </div>
+      <main id="main-content">
+        <section class="buttons-section" role="group" aria-labelledby="buttons-heading">
+          <h2 id="buttons-heading" class="sr-only">Animation buttons</h2>
+          <div class="button-item">
+            <button 
+              class="rive-button-large" 
+              id="standardButton"
+              aria-label="Add to wishlist"
+              aria-pressed="false"
+              type="button">
+              <canvas class="canvas-large" id="canvas-standard" aria-hidden="true"></canvas>
+            </button>
+            <div class="button-label" aria-hidden="true">Standard</div>
+          </div>
 
-        <div class="button-item">
-          <button class="rive-button-large" id="beatButton">
-            <canvas class="canvas-large" id="canvas-beat"></canvas>
-          </button>
-          <div class="button-label">Beat</div>
-        </div>
+          <div class="button-item">
+            <button 
+              class="rive-button-large" 
+              id="beatButton"
+              aria-label="Add to wishlist"
+              aria-pressed="false"
+              type="button">
+              <canvas class="canvas-large" id="canvas-beat" aria-hidden="true"></canvas>
+            </button>
+            <div class="button-label" aria-hidden="true">Beat</div>
+          </div>
 
-        <div class="button-item">
-          <button class="rive-button-large" id="spinButton">
-            <canvas class="canvas-large" id="canvas-spin"></canvas>
-          </button>
-          <div class="button-label">Spin</div>
-        </div>
+          <div class="button-item">
+            <button 
+              class="rive-button-large" 
+              id="spinButton"
+              aria-label="Add to wishlist"
+              aria-pressed="false"
+              type="button">
+              <canvas class="canvas-large" id="canvas-spin" aria-hidden="true"></canvas>
+            </button>
+            <div class="button-label" aria-hidden="true">Spin</div>
+          </div>
 
-        <div class="button-item">
-          <button class="rive-button-large" id="spinDoubleButton">
-            <canvas class="canvas-large" id="canvas-spin-double"></canvas>
-          </button>
-          <div class="button-label">Spin Double</div>
-        </div>
-      </div>
+          <div class="button-item">
+            <button 
+              class="rive-button-large" 
+              id="spinDoubleButton"
+              aria-label="Add to wishlist"
+              aria-pressed="false"
+              type="button">
+              <canvas class="canvas-large" id="canvas-spin-double" aria-hidden="true"></canvas>
+            </button>
+            <div class="button-label" aria-hidden="true">Spin Double</div>
+          </div>
+        </section>
+      </main>
 
       <div class="color-controls">
         <h2>Choose colours</h2>
@@ -245,13 +316,44 @@
         debugEl.textContent = message;
       }
 
+      // Update button accessibility attributes
+      function updateButtonAccessibility(buttonId, isSelected) {
+        const button = document.getElementById(buttonId + 'Button');
+        if (button) {
+          const ariaLabel = isSelected ? 'Remove from wishlist' : 'Add to wishlist';
+          button.setAttribute('aria-label', ariaLabel);
+          button.setAttribute('aria-pressed', isSelected.toString());
+          
+          // Announce the change to screen readers
+          const announcement = isSelected ? 'Added to wishlist' : 'Removed from wishlist';
+          announceToScreenReader(announcement);
+        }
+      }
+
+      // Announce changes to screen readers
+      function announceToScreenReader(message) {
+        const announcements = document.getElementById('announcements');
+        if (announcements) {
+          announcements.textContent = message;
+          // Clear after a short delay so repeated actions are announced
+          setTimeout(() => {
+            announcements.textContent = '';
+          }, 1000);
+        }
+      }
+
       // Generic click handler
       function handleButtonClick(buttonId, property) {
         if (property) {
           const currentValue = property.value;
-          property.value = !currentValue;
-          console.log(`${buttonId} button - Toggled IsSelected to:`, !currentValue);
-          updateDebugInfo(`${buttonId}: IsSelected = ${!currentValue}`);
+          const newValue = !currentValue;
+          property.value = newValue;
+          
+          // Update accessibility attributes
+          updateButtonAccessibility(buttonId, newValue);
+          
+          console.log(`${buttonId} button - Toggled IsSelected to:`, newValue);
+          updateDebugInfo(`${buttonId}: IsSelected = ${newValue}`);
         }
       }
 
@@ -331,6 +433,9 @@
               // Set initial state
               vmi.boolean('IsSelected').value = false;
               buttonStates[buttonId] = vmi.boolean('IsSelected');
+              
+              // Initialize accessibility attributes
+              updateButtonAccessibility(buttonId, false);
               
               // Log available properties
               console.log(`${buttonId} properties:`, Object.keys(vmi));
